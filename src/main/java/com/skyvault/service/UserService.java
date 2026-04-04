@@ -10,6 +10,8 @@ import com.skyvault.repository.UserRepository;
 import java.util.Optional;
 import com.skyvault.dto.LoginRequest;
 
+import com.skyvault.security.JwtUtil;
+
 @Service
 public class UserService {
 
@@ -18,6 +20,9 @@ public class UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public User saveUser(User user) {
 
@@ -36,13 +41,16 @@ public class UserService {
             User user = userOptional.get();
 
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return "Login Successful";
+
+                // ✅ Generate JWT Token
+                return jwtUtil.generateToken(user.getEmail());
+
             } else {
-                return "Invalid Password";
+                throw new RuntimeException("Invalid Password");
             }
 
         } else {
-            return "User not found";
+            throw new RuntimeException("User not found");
         }
     }
 }
