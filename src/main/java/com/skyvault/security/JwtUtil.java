@@ -7,12 +7,21 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
+
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "mysecretkeymysecretkeymysecretkey"; // must be long
+    @Value("${jwt.secret}")
+    private String SECRET;
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()
@@ -30,5 +39,12 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+    public Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.List;
@@ -30,6 +29,14 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        String path = request.getServletPath();
+
+        // ✅ SKIP JWT for login/register endpoints
+        if (path.startsWith("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String authHeader = request.getHeader("Authorization");
 
