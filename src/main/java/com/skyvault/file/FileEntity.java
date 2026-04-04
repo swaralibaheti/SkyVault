@@ -8,7 +8,7 @@ public class FileEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;   // ✅ PRIMARY KEY
 
     private String fileName;
 
@@ -16,10 +16,20 @@ public class FileEntity {
 
     private String filePath;
 
+    private Long userId;  // ✅ THIS IS USER ID
+
     public FileEntity() {}
 
     public Long getId() {
         return id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getFileName() {
