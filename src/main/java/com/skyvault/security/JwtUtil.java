@@ -23,28 +23,42 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String username) {
+    // ✅ GENERATE TOKEN USING USER ID
+    public String generateToken(Long userId) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(String.valueOf(userId)) // 🔥 IMPORTANT
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    // ✅ EXTRACT USER ID FROM TOKEN
+    public Long extractUserId(String token) {
+        return Long.parseLong(extractClaims(token).getSubject());
     }
+
+    // (Optional — keep if needed somewhere)
+    public String extractUsername(String token) {
+        return extractClaims(token).getSubject();
+    }
+
+    // ✅ COMMON METHOD
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    // ✅ VALIDATE TOKEN (optional but useful)
+    public boolean validateToken(String token) {
+        try {
+            extractClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

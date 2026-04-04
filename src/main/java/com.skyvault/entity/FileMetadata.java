@@ -12,21 +12,32 @@ public class FileMetadata {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 🔥 IMPORTANT: user ownership
+    private Long userId;
+
     @Setter
     private String fileName;
+
     @Setter
     private String localPath;
+
     @Setter
     private String s3Key;
+
     @Setter
     private long size;
+
     @Setter
     private LocalDateTime uploadTime;
 
-    // ✅ GETTERS & SETTERS
+    // ✅ GETTERS
 
     public Long getId() {
         return id;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public String getFileName() {
@@ -49,4 +60,9 @@ public class FileMetadata {
         return uploadTime;
     }
 
+    // ✅ SETTER FOR userId (VERY IMPORTANT)
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 }

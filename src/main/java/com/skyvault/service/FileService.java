@@ -24,6 +24,7 @@ import org.springframework.core.io.InputStreamResource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Service
 public class FileService {
@@ -37,7 +38,8 @@ public class FileService {
     @Autowired
     private FileMetadataRepository repository;
 
-    public String uploadFile(MultipartFile file) {
+    // ✅ UPDATED METHOD (with userId)
+    public String uploadFile(MultipartFile file, Long userId) {
 
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
@@ -76,6 +78,9 @@ public class FileService {
             metadata.setSize(file.getSize());
             metadata.setUploadTime(LocalDateTime.now());
 
+            // 🔥 IMPORTANT: attach userId
+            metadata.setUserId(userId);
+
             repository.save(metadata);
 
             return "Uploaded successfully: " + fileName;
@@ -84,32 +89,47 @@ public class FileService {
             throw new RuntimeException("File upload failed", e);
         }
     }
-    public Resource downloadFile(Long fileId) throws IOException {
+
+    public Resource downloadFile(Long fileId, Long userId) throws IOException {
 
         FileMetadata file = repository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
-        // LOCAL FILE
+        // 🔐 SECURITY CHECK
+        if (!file.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access");
+        }
+
+        // LOCAL
         if (file.getLocalPath() != null) {
             Path path = Paths.get(file.getLocalPath());
             return new UrlResource(path.toUri());
         }
 
-        // S3 FILE
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        // S3
+        GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(file.getS3Key())
                 .build();
 
-        InputStream s3Stream = s3Client.getObject(getObjectRequest);
+        InputStream s3Stream = s3Client.getObject(request);
         return new InputStreamResource(s3Stream);
     }
-    public String deleteFile(Long fileId) {
+
+    public String deleteFile(Long fileId, Long userId) {
 
         FileMetadata file = repository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
-        // 🔹 Delete local file
+        System.out.println("File userId: " + file.getUserId());
+        System.out.println("Request userId: " + userId);
+
+        // 🔐 SECURITY CHECK
+        if (!file.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized delete attempt");
+        }
+
+        // delete local
         if (file.getLocalPath() != null) {
             File localFile = new File(file.getLocalPath());
             if (localFile.exists()) {
@@ -117,17 +137,19 @@ public class FileService {
             }
         }
 
-        // 🔹 Delete from S3
+        // delete S3
         if (file.getS3Key() != null) {
             s3Client.deleteObject(builder -> builder
                     .bucket(bucketName)
-                    .key(file.getS3Key())
-            );
+                    .key(file.getS3Key()));
         }
 
-        // 🔹 Delete from DB
         repository.deleteById(fileId);
 
         return "File deleted successfully";
+    }
+
+    public List<FileMetadata> getFilesByUser(Long userId) {
+        return repository.findByUserId(userId);
     }
 }

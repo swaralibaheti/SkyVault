@@ -43,7 +43,7 @@ public class UserService {
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
 
                 // ✅ Generate JWT Token
-                return jwtUtil.generateToken(user.getEmail());
+                return jwtUtil.generateToken(user.getId());
 
             } else {
                 throw new RuntimeException("Invalid Password");
