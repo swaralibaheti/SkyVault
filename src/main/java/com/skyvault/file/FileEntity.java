@@ -55,4 +55,5 @@ public class FileEntity {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
+    private String s3Key;
 }

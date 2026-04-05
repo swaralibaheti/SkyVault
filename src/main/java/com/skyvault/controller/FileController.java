@@ -28,13 +28,7 @@ public class FileController {
             @RequestParam("file") MultipartFile file,
             HttpServletRequest request) {
 
-        String header = request.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body("Invalid token");
-        }
-
-        String token = header.substring(7);
+        String token = jwtUtil.extractToken(request);
         Long userId = jwtUtil.extractUserId(token);
 
         fileService.uploadFile(file, userId);
@@ -42,19 +36,13 @@ public class FileController {
         return ResponseEntity.ok("File uploaded successfully!");
     }
 
-    // ✅ DOWNLOAD FILE (SECURED)
-    @GetMapping("/download/{id}")
+    // ✅ DOWNLOAD FILE (DIRECT)
+    @GetMapping("/download-file/{id}")
     public ResponseEntity<Resource> downloadFile(
             @PathVariable Long id,
             HttpServletRequest request) throws IOException {
 
-        String header = request.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body(null);
-        }
-
-        String token = header.substring(7);
+        String token = jwtUtil.extractToken(request);
         Long userId = jwtUtil.extractUserId(token);
 
         Resource resource = fileService.downloadFile(id, userId);
@@ -65,19 +53,13 @@ public class FileController {
                 .body(resource);
     }
 
-    // ✅ DELETE FILE (SECURED 🔐)
+    // ✅ DELETE FILE
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteFile(
             @PathVariable Long id,
             HttpServletRequest request) {
 
-        String header = request.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body("Invalid token");
-        }
-
-        String token = header.substring(7);
+        String token = jwtUtil.extractToken(request);
         Long userId = jwtUtil.extractUserId(token);
 
         String response = fileService.deleteFile(id, userId);
@@ -89,15 +71,23 @@ public class FileController {
     @GetMapping("/my-files")
     public ResponseEntity<?> getMyFiles(HttpServletRequest request) {
 
-        String header = request.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body("Invalid token");
-        }
-
-        String token = header.substring(7);
+        String token = jwtUtil.extractToken(request);
         Long userId = jwtUtil.extractUserId(token);
 
         return ResponseEntity.ok(fileService.getFilesByUser(userId));
+    }
+
+    // ✅ PRE-SIGNED URL (SECURE DOWNLOAD 🔥)
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<?> getDownloadUrl(
+            @PathVariable Long fileId,
+            HttpServletRequest request) {
+
+        String token = jwtUtil.extractToken(request);
+        Long userId = jwtUtil.extractUserId(token);
+
+        String url = fileService.generatePresignedUrl(fileId, userId);
+
+        return ResponseEntity.ok(url);
     }
 }

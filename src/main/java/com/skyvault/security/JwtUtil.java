@@ -10,6 +10,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import jakarta.annotation.PostConstruct;
 
+import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class JwtUtil {
 
@@ -60,5 +61,16 @@ public class JwtUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public String extractToken(HttpServletRequest request) {
+
+        String header = request.getHeader("Authorization");
+
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new RuntimeException("Invalid or missing Authorization header");
+        }
+
+        return header.substring(7);
     }
 }
