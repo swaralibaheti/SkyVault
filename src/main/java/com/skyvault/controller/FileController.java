@@ -77,7 +77,7 @@ public class FileController {
         return ResponseEntity.ok(fileService.getFilesByUser(userId));
     }
 
-    // ✅ PRE-SIGNED URL (SECURE DOWNLOAD 🔥)
+    // ✅ PRE-SIGNED URL
     @GetMapping("/download/{fileId}")
     public ResponseEntity<?> getDownloadUrl(
             @PathVariable Long fileId,
@@ -89,5 +89,33 @@ public class FileController {
         String url = fileService.generatePresignedUrl(fileId, userId);
 
         return ResponseEntity.ok(url);
+    }
+
+    // 🔥 PASSWORD PROTECTED SHARE LINK
+    @GetMapping("/share/{fileId}")
+    public ResponseEntity<?> generateShareLink(
+            @PathVariable Long fileId,
+            @RequestParam String password,
+            HttpServletRequest request) {
+
+        String token = jwtUtil.extractToken(request);
+        Long userId = jwtUtil.extractUserId(token);
+
+        String link = fileService.generateShareLink(fileId, userId, password);
+
+        return ResponseEntity.ok(link);
+    }
+
+    // 🔥 PUBLIC ACCESS WITH PASSWORD
+    @GetMapping("/public/{token}")
+    public ResponseEntity<?> accessSharedFile(
+            @PathVariable String token,
+            @RequestParam String password) {
+
+        String url = fileService.getFileByShareToken(token, password);
+
+        return ResponseEntity.status(302)
+                .header("Location", url)
+                .build();
     }
 }

@@ -30,6 +30,11 @@ public class FileMetadata {
     @Setter
     private LocalDateTime uploadTime;
 
+    // 🔥 NEW FIELD (for sharing)
+    private String shareToken;
+
+    private String sharePassword;
+
     // ✅ GETTERS
 
     public Long getId() {
@@ -60,9 +65,28 @@ public class FileMetadata {
         return uploadTime;
     }
 
-    // ✅ SETTER FOR userId (VERY IMPORTANT)
+    public String getShareToken() {
+        return shareToken;
+    }
+
+    // ✅ SETTERS
 
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+
+    // 🔥 REQUIRED FIX
+    public void setShareToken(String shareToken) {
+        this.shareToken = shareToken;
+    }
+
+    public String getSharePassword() {
+        return sharePassword;
+    }
+
+    public void setSharePassword(String sharePassword) {
+        this.sharePassword = sharePassword;
+    }
+
+
 }

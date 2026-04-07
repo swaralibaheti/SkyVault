@@ -27,7 +27,6 @@ import java.util.List;
 
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.*;
-import software.amazon.awssdk.regions.Region;
 import java.time.Duration;
 
 @Service
@@ -45,16 +44,14 @@ public class FileService {
     @Autowired
     private S3Presigner presigner;
 
-    // ✅ UPLOAD FILE
+    // ✅ UPLOAD
     public String uploadFile(MultipartFile file, Long userId) {
 
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
         try {
             File folder = new File("uploads");
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
+            if (!folder.exists()) folder.mkdir();
 
             String localPath = "uploads/" + fileName;
             File localFile = new File(localPath);
@@ -63,19 +60,14 @@ public class FileService {
             fos.write(file.getBytes());
             fos.close();
 
-            // upload to S3
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(fileName)
                     .contentType(file.getContentType())
                     .build();
 
-            s3Client.putObject(
-                    putRequest,
-                    RequestBody.fromFile(localFile)
-            );
+            s3Client.putObject(putRequest, RequestBody.fromFile(localFile));
 
-            // save metadata
             FileMetadata metadata = new FileMetadata();
             metadata.setFileName(fileName);
             metadata.setLocalPath(localPath);
@@ -86,61 +78,54 @@ public class FileService {
 
             repository.save(metadata);
 
-            return "Uploaded successfully: " + fileName;
+            return "Uploaded successfully";
 
         } catch (IOException e) {
-            throw new RuntimeException("File upload failed", e);
+            throw new RuntimeException(e);
         }
     }
 
-    // ✅ DOWNLOAD FILE
+    // ✅ DOWNLOAD
     public Resource downloadFile(Long fileId, Long userId) throws IOException {
 
         FileMetadata file = repository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
         if (!file.getUserId().equals(userId)) {
-            throw new RuntimeException("Unauthorized access");
+            throw new RuntimeException("Unauthorized");
         }
 
-        // Try local first
         if (file.getLocalPath() != null) {
             Path path = Paths.get(file.getLocalPath());
-
             if (path.toFile().exists()) {
                 return new UrlResource(path.toUri());
             }
         }
 
-        // fallback to S3
         GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(file.getS3Key())
                 .build();
 
-        InputStream s3Stream = s3Client.getObject(request);
-        return new InputStreamResource(s3Stream);
+        InputStream stream = s3Client.getObject(request);
+        return new InputStreamResource(stream);
     }
 
-    // ✅ DELETE FILE
+    // ✅ DELETE
     public String deleteFile(Long fileId, Long userId) {
 
         FileMetadata file = repository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
         if (!file.getUserId().equals(userId)) {
-            throw new RuntimeException("Unauthorized delete attempt");
+            throw new RuntimeException("Unauthorized");
         }
 
-        // delete local
         if (file.getLocalPath() != null) {
-            File localFile = new File(file.getLocalPath());
-            if (localFile.exists()) {
-                localFile.delete();
-            }
+            File local = new File(file.getLocalPath());
+            if (local.exists()) local.delete();
         }
 
-        // delete from S3
         if (file.getS3Key() != null) {
             DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                     .bucket(bucketName)
@@ -151,19 +136,18 @@ public class FileService {
         }
 
         repository.deleteById(fileId);
-
-        return "File deleted successfully";
+        return "Deleted";
     }
 
-    // ✅ GET USER FILES
+    // ✅ GET FILES
     public List<FileMetadata> getFilesByUser(Long userId) {
         return repository.findByUserId(userId);
     }
 
-    // 🔥 FIXED PRESIGNED URL METHOD
+    // ✅ PRESIGNED URL
     public String generatePresignedUrl(String key) {
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        GetObjectRequest request = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
                 .build();
@@ -171,16 +155,14 @@ public class FileService {
         GetObjectPresignRequest presignRequest =
                 GetObjectPresignRequest.builder()
                         .signatureDuration(Duration.ofMinutes(5))
-                        .getObjectRequest(getObjectRequest)
+                        .getObjectRequest(request)
                         .build();
 
-        PresignedGetObjectRequest presignedRequest =
-                presigner.presignGetObject(presignRequest);
-
-        return presignedRequest.url().toString();
+        return presigner.presignGetObject(presignRequest)
+                .url()
+                .toString();
     }
 
-    // ✅ SECURE WRAPPER
     public String generatePresignedUrl(Long fileId, Long userId) {
 
         FileMetadata file = repository.findById(fileId)
@@ -188,6 +170,39 @@ public class FileService {
 
         if (!file.getUserId().equals(userId)) {
             throw new RuntimeException("Unauthorized");
+        }
+
+        return generatePresignedUrl(file.getS3Key());
+    }
+
+    // ✅ SHARE LINK WITH PASSWORD
+    public String generateShareLink(Long fileId, Long userId, String password) {
+
+        FileMetadata file = repository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        if (!file.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        String token = java.util.UUID.randomUUID().toString();
+
+        file.setShareToken(token);
+        file.setSharePassword(password);
+
+        repository.save(file);
+
+        return "http://localhost:8080/files/public/" + token;
+    }
+
+    // ✅ ACCESS SHARED FILE
+    public String getFileByShareToken(String token, String password) {
+
+        FileMetadata file = repository.findByShareToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid link"));
+
+        if (file.getSharePassword() == null || !file.getSharePassword().equals(password)) {
+            throw new RuntimeException("Wrong password");
         }
 
         return generatePresignedUrl(file.getS3Key());
