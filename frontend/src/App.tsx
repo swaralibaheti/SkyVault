@@ -11,15 +11,31 @@ function App() {
 
     return (
         <Router>
-            <div className="min-h-screen bg-gray-950 text-gray-100">
-                <Navbar />
+            <div
+                style={{
+                    minHeight: '100vh',
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                }}
+            >
+                {/* Navbar only on authenticated pages */}
+                {isAuthenticated && <Navbar />}
 
-                <div className="flex">
-                    {/* Sidebar - Only show when authenticated and on large screens */}
+                <div style={{ display: 'flex', flex: 1 }}>
+                    {/* Sidebar only on authenticated pages */}
                     {isAuthenticated && <Sidebar />}
 
-                    {/* Main Content Area */}
-                    <main className={`flex-1 ${isAuthenticated ? 'lg:ml-64' : ''} min-h-[calc(100vh-64px)]`}>
+                    {/* Main Content */}
+                    <main
+                        style={{
+                            flex: 1,
+                            marginLeft: isAuthenticated ? '256px' : '0', // 64px * 4 = 256px (sidebar width)
+                            minHeight: 'calc(100vh - 64px)',
+                            padding: isAuthenticated ? '20px' : '0',
+                        }}
+                    >
                         <Routes>
                             {/* Public Routes */}
                             <Route
@@ -37,7 +53,7 @@ function App() {
                                 element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />}
                             />
 
-                            {/* Default Route */}
+                            {/* Default */}
                             <Route
                                 path="/"
                                 element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}

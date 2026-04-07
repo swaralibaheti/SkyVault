@@ -9,7 +9,6 @@ const Sidebar = () => {
 
     const isActive = (path: string) => location.pathname === path;
 
-    // Trigger file upload from sidebar
     const triggerUpload = () => {
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         fileInput?.click();
@@ -19,50 +18,100 @@ const Sidebar = () => {
         <motion.div
             initial={{ x: -20 }}
             animate={{ x: 0 }}
-            className="w-64 bg-gray-900 border-r border-gray-800 h-screen fixed left-0 top-0 pt-20 hidden lg:block z-40"
+            style={{
+                width: '256px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                backdropFilter: 'blur(40px)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.18)',
+                height: '100vh',
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                paddingTop: '80px',
+                zIndex: 40,
+                display: 'none', // hidden on mobile (lg:block via Tailwind if you want)
+            }}
+            className="hidden lg:block"
         >
-            <div className="px-6 py-8">
-                <div className="space-y-2">
+            <div style={{ padding: '32px 24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <Link
                         to="/dashboard"
-                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
-                            isActive('/dashboard')
-                                ? 'bg-blue-600 text-white'
-                                : 'hover:bg-gray-800 text-gray-400 hover:text-white'
-                        }`}
+                        style={{
+                            padding: '16px 20px',
+                            borderRadius: '16px',
+                            background: isActive('/dashboard') ? 'rgba(59, 130, 246, 0.9)' : 'transparent',
+                            color: isActive('/dashboard') ? 'white' : '#94a3b8',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            textDecoration: 'none',
+                            fontWeight: '500',
+                        }}
                     >
-                        <Home size={20} />
-                        <span className="font-medium">Dashboard</span>
+                        <Home size={22} />
+                        Dashboard
                     </Link>
 
                     <Link
                         to="/dashboard"
-                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
-                            isActive('/dashboard')
-                                ? 'bg-blue-600 text-white'
-                                : 'hover:bg-gray-800 text-gray-400 hover:text-white'
-                        }`}
+                        style={{
+                            padding: '16px 20px',
+                            borderRadius: '16px',
+                            background: isActive('/dashboard') ? 'rgba(59, 130, 246, 0.9)' : 'transparent',
+                            color: isActive('/dashboard') ? 'white' : '#94a3b8',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            textDecoration: 'none',
+                            fontWeight: '500',
+                        }}
                     >
-                        <Files size={20} />
-                        <span className="font-medium">My Files</span>
+                        <Files size={22} />
+                        My Files
                     </Link>
 
                     <button
                         onClick={triggerUpload}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-800 text-gray-400 hover:text-white transition-all"
+                        style={{
+                            padding: '16px 20px',
+                            borderRadius: '16px',
+                            background: 'transparent',
+                            color: '#94a3b8',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            border: 'none',
+                            width: '100%',
+                            textAlign: 'left',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                        }}
                     >
-                        <Upload size={20} />
-                        <span className="font-medium">Upload File</span>
+                        <Upload size={22} />
+                        Upload File
                     </button>
                 </div>
 
-                <div className="mt-12 pt-6 border-t border-gray-800">
+                <div style={{ marginTop: '80px', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-400 hover:bg-red-950/50 hover:text-red-500 transition-all"
+                        style={{
+                            padding: '16px 20px',
+                            borderRadius: '16px',
+                            color: '#f87171',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            border: 'none',
+                            width: '100%',
+                            background: 'transparent',
+                            cursor: 'pointer',
+                            fontWeight: '500',
+                        }}
                     >
-                        <LogOut size={20} />
-                        <span className="font-medium">Logout</span>
+                        <LogOut size={22} />
+                        Logout
                     </button>
                 </div>
             </div>

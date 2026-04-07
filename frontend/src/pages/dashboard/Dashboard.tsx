@@ -112,10 +112,10 @@ const Dashboard = () => {
 
     const getFileIcon = (fileName: string) => {
         const ext = fileName.split('.').pop()?.toLowerCase();
-        if (['jpg', 'png', 'gif', 'jpeg', 'webp'].includes(ext || '')) return <Image className="w-10 h-10 text-pink-500" />;
-        if (['mp4', 'mov', 'avi'].includes(ext || '')) return <Video className="w-10 h-10 text-purple-500" />;
-        if (['mp3', 'wav'].includes(ext || '')) return <Music className="w-10 h-10 text-amber-500" />;
-        return <FileText className="w-10 h-10 text-blue-500" />;
+        if (['jpg', 'png', 'gif', 'jpeg', 'webp'].includes(ext || '')) return <Image size={48} style={{ color: '#ec4899' }} />;
+        if (['mp4', 'mov', 'avi'].includes(ext || '')) return <Video size={48} style={{ color: '#a855f7' }} />;
+        if (['mp3', 'wav'].includes(ext || '')) return <Music size={48} style={{ color: '#f59e0b' }} />;
+        return <FileText size={48} style={{ color: '#3b82f6' }} />;
     };
 
     const formatFileSize = (bytes?: number) => {
@@ -146,7 +146,7 @@ const Dashboard = () => {
         }
     };
 
-    // ==================== NEW: SHARE FUNCTIONALITY ====================
+    // ==================== SHARE FUNCTIONALITY ====================
     const handleShare = (fileId: number, fileName: string) => {
         setSelectedFileId(fileId);
         setSelectedFileName(fileName);
@@ -176,213 +176,428 @@ const Dashboard = () => {
 
     // Skeleton Loader
     const SkeletonCard = () => (
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 animate-pulse">
-            <div className="flex justify-center mb-5">
-                <div className="w-10 h-10 bg-gray-700 rounded-xl" />
+        <div
+            style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: '24px',
+                padding: '32px 24px',
+                animation: 'pulse 1.5s infinite',
+            }}
+        >
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+                <div style={{ width: '56px', height: '56px', background: 'rgba(255,255,255,0.1)', borderRadius: '16px' }} />
             </div>
-            <div className="h-5 bg-gray-700 rounded w-3/4 mx-auto mb-3" />
-            <div className="h-3 bg-gray-700 rounded w-1/2 mx-auto" />
-            <div className="grid grid-cols-4 gap-3 mt-10">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="h-9 bg-gray-700 rounded-xl" />
-                ))}
-            </div>
+            <div style={{ height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', width: '75%', margin: '0 auto 12px' }} />
+            <div style={{ height: '14px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', width: '50%', margin: '0 auto' }} />
         </div>
     );
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-                <div className="flex items-center gap-4">
-                    <img src="/skyvault_logo.png" alt="SkyVault" className="h-12 w-auto" />
-                    <div>
-                        <h1 className="text-4xl font-bold tracking-tighter text-white">My SkyVault</h1>
-                        <p className="text-gray-400">Secure Cloud Storage</p>
+        <div
+            style={{
+                minHeight: '100vh',
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
+                padding: '40px 24px',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+            }}
+        >
+            {/* Futuristic background glow */}
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.25) 0%, transparent 70%)',
+                    pointerEvents: 'none',
+                    zIndex: -1,
+                }}
+            />
+
+            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '48px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <h1
+                                style={{
+                                    fontSize: '42px',
+                                    fontWeight: '700',
+                                    color: '#ffffff',
+                                    letterSpacing: '-2px',
+                                }}
+                            >
+                                My SkyVault
+                            </h1>
+                            <p style={{ color: '#94a3b8', fontSize: '20px', marginTop: '4px' }}>
+                                Secure Cloud Storage
+                            </p>
+                        </div>
+
+                        <label
+                            style={{
+                                cursor: 'pointer',
+                                background: 'linear-gradient(90deg, #3b82f6, #22d3ee)',
+                                color: 'white',
+                                padding: '18px 32px',
+                                borderRadius: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                fontWeight: '600',
+                                fontSize: '18px',
+                                boxShadow: '0 15px 35px -10px rgba(59, 130, 246, 0.7)',
+                            }}
+                        >
+                            <Upload size={24} />
+                            Upload New File
+                            <input type="file" className="hidden" onChange={handleFileSelect} />
+                        </label>
+                    </div>
+
+                    {/* Search */}
+                    <div style={{ position: 'relative' }}>
+                        <Search
+                            size={24}
+                            style={{
+                                position: 'absolute',
+                                left: '24px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                color: '#64748b',
+                            }}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Search your files..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '20px 24px 20px 68px',
+                                background: 'rgba(255, 255, 255, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
+                                borderRadius: '16px',
+                                color: 'white',
+                                fontSize: '17px',
+                                outline: 'none',
+                                backdropFilter: 'blur(12px)',
+                            }}
+                        />
                     </div>
                 </div>
 
-                <label className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl flex items-center gap-3 font-semibold transition-all active:scale-95">
-                    <Upload size={22} />
-                    Upload New File
-                    <input type="file" className="hidden" onChange={handleFileSelect} />
-                </label>
-            </div>
+                {/* Drag & Drop Zone */}
+                <motion.div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    style={{
+                        border: `2px dashed ${isDragging ? '#3b82f6' : 'rgba(255,255,255,0.25)'}`,
+                        borderRadius: '24px',
+                        padding: '80px 40px',
+                        textAlign: 'center',
+                        marginBottom: '48px',
+                        background: isDragging ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.05)',
+                        transition: 'all 0.3s',
+                    }}
+                >
+                    <Upload size={72} style={{ margin: '0 auto 24px', color: '#64748b' }} />
+                    <p style={{ fontSize: '28px', fontWeight: '600', color: '#ffffff' }}>Drop files here</p>
+                    <p style={{ color: '#94a3b8', marginTop: '8px' }}>or use the upload button above</p>
+                </motion.div>
 
-            {/* Search */}
-            <div className="relative mb-8">
-                <Search className="absolute left-4 top-3.5 text-gray-400" size={20} />
-                <input
-                    type="text"
-                    placeholder="Search your files..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-2xl focus:outline-none focus:border-blue-500 text-white placeholder-gray-500"
-                />
-            </div>
-
-            {/* Drag & Drop Zone */}
-            <motion.div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-3xl p-16 text-center mb-12 transition-all ${
-                    isDragging ? 'border-blue-500 bg-blue-950/50' : 'border-gray-700 hover:border-gray-600'
-                }`}
-            >
-                <Upload className="mx-auto mb-6 text-gray-400" size={56} />
-                <p className="text-2xl font-medium text-white">Drop files here</p>
-                <p className="text-gray-400 mt-2">or use the upload button above</p>
-            </motion.div>
-
-            {/* Upload Progress */}
-            <AnimatePresence>
-                {isUploading && (
-                    <div className="mb-10 bg-gray-900 rounded-3xl p-6 border border-gray-700">
-                        <div className="flex justify-between text-sm mb-3">
-                            <span>Uploading...</span>
-                            <span>{uploadProgress}%</span>
+                {/* Upload Progress */}
+                <AnimatePresence>
+                    {isUploading && (
+                        <div
+                            style={{
+                                background: 'rgba(255,255,255,0.1)',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                borderRadius: '24px',
+                                padding: '24px',
+                                marginBottom: '48px',
+                                backdropFilter: 'blur(12px)',
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
+                                <span style={{ color: '#94a3b8' }}>Uploading...</span>
+                                <span style={{ color: '#ffffff' }}>{uploadProgress}%</span>
+                            </div>
+                            <div
+                                style={{
+                                    height: '10px',
+                                    background: 'rgba(255,255,255,0.15)',
+                                    borderRadius: '9999px',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <motion.div
+                                    style={{
+                                        height: '100%',
+                                        background: 'linear-gradient(90deg, #3b82f6, #22d3ee)',
+                                        borderRadius: '9999px',
+                                    }}
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${uploadProgress}%` }}
+                                />
+                            </div>
                         </div>
-                        <div className="h-2.5 bg-gray-800 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${uploadProgress}%` }}
-                            />
-                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Files Grid */}
+                {loading ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                        {[...Array(6)].map((_, i) => (
+                            <SkeletonCard key={i} />
+                        ))}
+                    </div>
+                ) : filteredFiles.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+                        <div style={{ fontSize: '80px', marginBottom: '24px', opacity: 0.3 }}>☁️</div>
+                        <p style={{ fontSize: '28px', color: '#94a3b8' }}>
+                            {searchTerm ? 'No files match your search' : 'Your vault is empty'}
+                        </p>
+                    </div>
+                ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                        <AnimatePresence>
+                            {filteredFiles.map((file) => (
+                                <motion.div
+                                    key={file.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    style={{
+                                        background: 'rgba(255,255,255,0.1)',
+                                        border: '1px solid rgba(255,255,255,0.15)',
+                                        borderRadius: '24px',
+                                        padding: '32px 24px',
+                                        backdropFilter: 'blur(16px)',
+                                        transition: 'all 0.3s',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+                                        {getFileIcon(file.fileName)}
+                                    </div>
+
+                                    <p
+                                        style={{
+                                            fontSize: '18px',
+                                            fontWeight: '600',
+                                            textAlign: 'center',
+                                            color: '#ffffff',
+                                            marginBottom: '12px',
+                                            lineHeight: '1.3',
+                                        }}
+                                    >
+                                        {file.fileName}
+                                    </p>
+
+                                    <p style={{ fontSize: '14px', color: '#64748b', textAlign: 'center' }}>
+                                        {formatFileSize(file.size)} • {new Date(file.uploadTime).toLocaleDateString()}
+                                    </p>
+
+                                    {/* Action Buttons */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginTop: '32px' }}>
+                                        <button
+                                            onClick={() => copyPresignedLink(file.id)}
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                background: 'none',
+                                                border: 'none',
+                                                color: '#94a3b8',
+                                                cursor: 'pointer',
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            <Copy size={22} />
+                                            Link
+                                        </button>
+
+                                        <button
+                                            onClick={() => window.open(`/files/download-file/${file.id}`, '_blank')}
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                background: 'none',
+                                                border: 'none',
+                                                color: '#94a3b8',
+                                                cursor: 'pointer',
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            <Download size={22} />
+                                            Download
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleShare(file.id, file.fileName)}
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                background: 'none',
+                                                border: 'none',
+                                                color: '#94a3b8',
+                                                cursor: 'pointer',
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            <Share2 size={22} />
+                                            Share
+                                        </button>
+
+                                        <button
+                                            onClick={() => deleteFile(file.id, file.fileName)}
+                                            style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                                background: 'none',
+                                                border: 'none',
+                                                color: '#f87171',
+                                                cursor: 'pointer',
+                                                fontSize: '13px',
+                                            }}
+                                        >
+                                            <Trash2 size={22} />
+                                            Delete
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
                     </div>
                 )}
-            </AnimatePresence>
 
-            {/* Files Grid */}
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
-                </div>
-            ) : filteredFiles.length === 0 ? (
-                <div className="text-center py-20">
-                    <div className="text-7xl mb-6 opacity-40">☁️</div>
-                    <p className="text-2xl text-gray-400">
-                        {searchTerm ? 'No files match your search' : 'Your vault is empty'}
-                    </p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <AnimatePresence>
-                        {filteredFiles.map((file) => (
+                {/* ==================== SHARE MODAL ==================== */}
+                <AnimatePresence>
+                    {showShareModal && (
+                        <div
+                            style={{
+                                position: 'fixed',
+                                inset: 0,
+                                background: 'rgba(0,0,0,0.85)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 9999,
+                            }}
+                        >
                             <motion.div
-                                key={file.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-gray-900 border border-gray-800 rounded-3xl p-6 hover:border-blue-600/50 transition-all group"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                style={{
+                                    background: 'rgba(15, 23, 42, 0.95)',
+                                    backdropFilter: 'blur(40px)',
+                                    border: '1px solid rgba(255,255,255,0.18)',
+                                    borderRadius: '28px',
+                                    padding: '40px',
+                                    width: '100%',
+                                    maxWidth: '440px',
+                                }}
                             >
-                                <div className="flex justify-center mb-5">
-                                    {getFileIcon(file.fileName)}
-                                </div>
+                                <h3 style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff', marginBottom: '8px' }}>
+                                    Share File
+                                </h3>
+                                <p style={{ color: '#94a3b8', marginBottom: '32px' }}>"{selectedFileName}"</p>
 
-                                <p className="font-medium text-center line-clamp-2 min-h-[48px] text-white break-words">
-                                    {file.fileName}
-                                </p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                                    <div>
+                                        <label style={{ display: 'block', color: '#94a3b8', fontSize: '15px', marginBottom: '8px' }}>
+                                            Password Protection (Optional)
+                                        </label>
+                                        <input
+                                            type="password"
+                                            value={sharePassword}
+                                            onChange={(e) => setSharePassword(e.target.value)}
+                                            placeholder="Leave empty for anyone with link"
+                                            style={{
+                                                width: '100%',
+                                                padding: '18px 24px',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                border: '1px solid rgba(255,255,255,0.15)',
+                                                borderRadius: '16px',
+                                                color: 'white',
+                                                fontSize: '17px',
+                                                outline: 'none',
+                                                backdropFilter: 'blur(12px)',
+                                            }}
+                                        />
+                                    </div>
 
-                                <p className="text-xs text-gray-500 text-center mt-3">
-                                    {formatFileSize(file.size)} • {new Date(file.uploadTime).toLocaleDateString()}
-                                </p>
+                                    {generatedLink && (
+                                        <div
+                                            style={{
+                                                background: 'rgba(255,255,255,0.1)',
+                                                padding: '20px',
+                                                borderRadius: '16px',
+                                                border: '1px solid rgba(255,255,255,0.15)',
+                                            }}
+                                        >
+                                            <p style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '4px' }}>Share Link:</p>
+                                            <p style={{ color: '#22d3ee', wordBreak: 'break-all', fontSize: '15px' }}>
+                                                {generatedLink}
+                                            </p>
+                                        </div>
+                                    )}
 
-                                {/* Action Buttons */}
-                                <div className="grid grid-cols-4 gap-3 mt-8">
-                                    <button
-                                        onClick={() => copyPresignedLink(file.id)}
-                                        className="flex flex-col items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors"
-                                    >
-                                        <Copy size={20} />
-                                        Link
-                                    </button>
-
-                                    <button
-                                        onClick={() => window.open(`/files/download-file/${file.id}`, '_blank')}
-                                        className="flex flex-col items-center gap-1.5 text-xs text-gray-400 hover:text-emerald-400 transition-colors"
-                                    >
-                                        <Download size={20} />
-                                        Download
-                                    </button>
-
-                                    <button
-                                        onClick={() => handleShare(file.id, file.fileName)}
-                                        className="flex flex-col items-center gap-1.5 text-xs text-gray-400 hover:text-violet-400 transition-colors"
-                                    >
-                                        <Share2 size={20} />
-                                        Share
-                                    </button>
-
-                                    <button
-                                        onClick={() => deleteFile(file.id, file.fileName)}
-                                        className="flex flex-col items-center gap-1.5 text-xs text-red-400 hover:text-red-500 transition-colors"
-                                    >
-                                        <Trash2 size={20} />
-                                        Delete
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '16px' }}>
+                                        <button
+                                            onClick={() => setShowShareModal(false)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '18px',
+                                                background: 'transparent',
+                                                border: '1px solid rgba(255,255,255,0.2)',
+                                                color: '#94a3b8',
+                                                borderRadius: '16px',
+                                                fontWeight: '600',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={generateShareLink}
+                                            disabled={isGenerating}
+                                            style={{
+                                                flex: 1,
+                                                padding: '18px',
+                                                background: 'linear-gradient(90deg, #3b82f6, #22d3ee)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '16px',
+                                                fontWeight: '600',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            {isGenerating ? 'Generating...' : 'Generate & Copy Link'}
+                                        </button>
+                                    </div>
                                 </div>
                             </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
-            )}
+                        </div>
+                    )}
+                </AnimatePresence>
+            </div>
 
-            {/* ==================== SHARE MODAL ==================== */}
-            <AnimatePresence>
-                {showShareModal && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="bg-gray-900 rounded-3xl p-8 w-full max-w-md border border-gray-700"
-                        >
-                            <h3 className="text-2xl font-semibold mb-2">Share File</h3>
-                            <p className="text-gray-400 mb-6">"{selectedFileName}"</p>
-
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm text-gray-400 mb-2">
-                                        Password Protection (Optional)
-                                    </label>
-                                    <input
-                                        type="password"
-                                        value={sharePassword}
-                                        onChange={(e) => setSharePassword(e.target.value)}
-                                        placeholder="Leave empty for anyone with link"
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-violet-500"
-                                    />
-                                </div>
-
-                                {generatedLink && (
-                                    <div className="bg-gray-800 p-4 rounded-2xl break-all">
-                                        <p className="text-xs text-gray-400 mb-1">Share Link:</p>
-                                        <p className="text-sm text-violet-400">{generatedLink}</p>
-                                    </div>
-                                )}
-
-                                <div className="flex gap-3 pt-4">
-                                    <button
-                                        onClick={() => setShowShareModal(false)}
-                                        className="flex-1 py-3.5 rounded-2xl border border-gray-700 hover:bg-gray-800 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={generateShareLink}
-                                        disabled={isGenerating}
-                                        className="flex-1 py-3.5 bg-violet-600 hover:bg-violet-700 rounded-2xl font-medium transition-all disabled:opacity-70"
-                                    >
-                                        {isGenerating ? "Generating..." : "Generate & Copy Link"}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Spinner Animation */}
+            <style>{`
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                }
+            `}</style>
         </div>
     );
 };
